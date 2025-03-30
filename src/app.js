@@ -12,4 +12,10 @@ app.use(express.urlencoded({extended: true, limit: "16kb"})); //configure data c
 app.use(express.static("public")); // tell express static files are present in public so that we don't neet to write ../public/---/--- insted /---/---
 app.use(cookieParser());
 
+//routes import
+import userRouter from "./routes/user.routes.js";
+
+//routes declaration
+app.use("/api/v1/users", userRouter); // this url tell this is api version 1 for users
+
 export default app;

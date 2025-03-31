@@ -1,7 +1,8 @@
-import mongoose, {mongo} from "mongoose";
+import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+import {Video} from "./video.models.js";
 
 const userSchema = new mongoose.Schema( // don't forget new
   {
@@ -52,10 +53,9 @@ const userSchema = new mongoose.Schema( // don't forget new
 
 // this contain all the fields in videoSchema and this can only be accessed in normal function syntax
 
-userSchema.plugin(mongooseAggregatePaginate);
 userSchema.pre("save", async function (req, res, next) {
   //pre hook middleware on save normal function
-  if (!this.isModidied("password")) {
+  if (!this.isModified("password")) {
     return next();
   }
   this.password = await bcrypt.hash(this.password, 10); //.hash (password  , no. of folds)

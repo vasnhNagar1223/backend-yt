@@ -4,10 +4,10 @@ import fs from "fs";
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.cdwrfbuigvrfsovrsvbou, // Click 'View API Keys' above to copy your API secret
+  api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
 });
 
-const uloadOnCloudinary = async (localFilePath) => {
+const uploadOnCloudinary = async (localFilePath) => {
   try {
     if (!localFilePath) {
       //cheaks if path is coorect
@@ -18,7 +18,9 @@ const uloadOnCloudinary = async (localFilePath) => {
       resource_type: "auto",
     });
 
-    console.log(`file uploaded on cloudinary  `, response.url);
+    // console.log(`file uploaded on cloudinary  `, response);
+
+    fs.unlinkSync(localFilePath);
 
     return response;
   } catch (err) {
@@ -28,4 +30,4 @@ const uloadOnCloudinary = async (localFilePath) => {
   }
 };
 
-export {uloadOnCloudinary};
+export {uploadOnCloudinary};

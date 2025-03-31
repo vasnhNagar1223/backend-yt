@@ -4,7 +4,7 @@ import {upload} from "../middleware/multer.middleware.js";
 
 const router = Router();
 
-// uplad field middleware and function - register user
+// upload field middleware and function - register user(middleware added in route adds data in req to use in registerUser)
 router.route("/register").post(
   upload.fields([
     {name: "avatar", maxCount: 1},

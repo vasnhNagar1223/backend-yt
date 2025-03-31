@@ -1,6 +1,7 @@
 import mongoose, {mongo} from "mongoose";
-import {jwt} from "jsonwebtoken";
-import {bcrypt} from "bcrypt";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const userSchema = new mongoose.Schema( // don't forget new
   {
@@ -57,7 +58,7 @@ userSchema.pre("save", async function (req, res, next) {
   if (!this.isModidied("password")) {
     return next();
   }
-  this.password = bcrypt.hash(this.password, 10); //.hash (password  , no. of folds)
+  this.password = await bcrypt.hash(this.password, 10); //.hash (password  , no. of folds)
 });
 
 //custom methods - must be called manually

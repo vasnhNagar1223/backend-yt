@@ -63,8 +63,9 @@ userSchema.pre("save", async function (req, res, next) {
 
 //custom methods - must be called manually
 //methods is an object of methods/function
+// there are not availabe in User model they are prensent in normal user
 userSchema.methods.isPasswordCorrect = async function (password) {
-  await bcrypt.compare(password, this.password);
+  return await bcrypt.compare(password, this.password);
 };
 
 userSchema.methods.generateAcessToken = function () {
@@ -75,18 +76,18 @@ userSchema.methods.generateAcessToken = function () {
       username: this.username,
       fullname: this.fullname,
     },
-    process.ACCESS_TOKEN_STRING,
-    {expiresIn: ACESS_TOKEN_EXPIRY}
+    process.env.ACCESS_TOKEN_STRING,
+    {expiresIn: process.env.ACESS_TOKEN_EXPIRY}
   );
 };
 
-userSchema.methods.generateRefreshToken = async function () {
+userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
       _id: this._id,
     },
-    process.REFRESH_TOKEN_SECRET,
-    {expiresIn: REFRESH_TOKEN_EXPIRY}
+    process.env.REFRESH_TOKEN_SECRET,
+    {expiresIn: process.env.REFRESH_TOKEN_EXPIRY}
   );
 };
 

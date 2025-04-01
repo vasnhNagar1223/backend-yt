@@ -3,6 +3,7 @@ import {ApiError} from "../utils/api.errors.js";
 import {User} from "../models/user.models.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js";
 import {ApiResponse} from "../utils/api.response.js";
+import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -177,4 +178,55 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "user logged out successfully"));
 });
 
-export {registerUser, loginUser, logoutUser};
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  try {
+    const incomingRefreshToken =
+      req.cookies.refreshToken || req.body.refreshToken;
+
+    if (!incomingRefreshToken) {
+      throw ApiError(400, "invalid refresh token");
+    }
+
+    const decodedRefreshToken = jwt.verify(
+      incomingRefreshToken,
+      REFRESH_TOKEN_SECRET
+    );
+
+    // req se user ka data nikal ke refresh token compare karana hai
+    const user = await User.findById(decodedRefreshToken?._id);
+
+    if (!user) {
+      throw ApiError(400, "user not found");
+    }
+
+    // agar  refresh token exist - grannt access token  karna hai cookie me
+
+    if (user?.refreshToken !== incomingRefreshToken) {
+      throw ApiError(401, "invalid refresh token");
+    }
+    const {accessToken, refreshToken} = await generateAccessAndRefreshToken(
+      user._id
+    );
+
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json(
+        new ApiResponse(
+          200,
+          {accessToken, refreshToken},
+          "Access token refreshed"
+        )
+      );
+  } catch (error) {
+    throw ApiError(401, error.message || "invalid refresh token");
+  }
+});
+
+export {registerUser, loginUser, logoutUser, refreshAccessToken};

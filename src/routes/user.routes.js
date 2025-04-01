@@ -3,6 +3,7 @@ import {
   registerUser,
   loginUser,
   logoutUser,
+  refreshAccessToken,
 } from "../controllers/user.controller.js";
 import {upload} from "../middleware/multer.middleware.js";
 import {verifyJWT} from "../middleware/auth.middleware.js";
@@ -20,8 +21,9 @@ router.route("/register").post(
 
 router.route("/login").post(loginUser);
 
-//secured routes
+//secured routes - secured routes mean user loged in hona chaiye
 
 router.route("/logout").post(verifyJWT, logoutUser);
+router.route("/refreshToken").post(refreshAccessToken);
 
 export default router;

@@ -51,9 +51,10 @@ const userSchema = new mongoose.Schema( // don't forget new
   {timestamps: true}
 );
 
-// this contain all the fields in videoSchema and this can only be accessed in normal function syntax
-
-userSchema.pre("save", async function (req, res, next) {
+//...................................................................................
+// .pre("save") -> only works with .save() or .create(), not with .findByIdAndUpdate() or .updateOne().
+//...................................................................................
+userSchema.pre("save", async function (next) {
   //pre hook middleware on save normal function
   if (!this.isModified("password")) {
     return next();

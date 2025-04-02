@@ -1,5 +1,8 @@
 import multer from "multer";
 
+// ye basicly give jagha pe save karta hai aur uske path aur data req me dal deta hai
+
+// give req.file option
 const storage = multer.diskStorage({
   // store in disk so that ram don't fill up
   destination: function (req, file, cb) {

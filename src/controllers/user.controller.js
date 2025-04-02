@@ -229,4 +229,110 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 });
 
-export {registerUser, loginUser, logoutUser, refreshAccessToken};
+//awt middleware req/???
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  const {oldPassword, newPassword} = req.body;
+
+  const user = await User.findById(req.user?._id);
+
+  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+
+  if (!isPasswordCorrect) {
+    throw new ApiError(400, "invalid password");
+  }
+
+  await User.findByIdAndUpdate(user._id, {password: newPassword}, {new: true});
+
+  res.status(200).json(ApiResponse(200, {}, "password changed Succesfully"));
+});
+
+//awt middleware req/???
+const getCurrectUser = asyncHandler(async (req, res) => {
+  res
+    .status(200)
+    .json(ApiResponse(200, req.user, "current user fetched successfully"));
+});
+
+// agar koi file update kara rahe hai to uske controller alag se likne hai
+// production level pe hota hai
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  const {fullname, email} = req.body;
+
+  if (!fullname || !email) {
+    throw ApiError(400, "all fields are required");
+  }
+
+  const updatedUserDetails = await User.findByIdAndUpdate(
+    req.user?._id,
+    {$set: {fullname, email}},
+    {new: true}
+  ).select("-password -refreshToken");
+
+  res
+    .status(200)
+    .json(
+      ApiResponse(
+        200,
+        {updatedUserDetails},
+        "account details updated successfully"
+      )
+    );
+});
+
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  const avatarLoacalPath = req.file?.path;
+
+  if (!avatarLoacalPath) {
+    throw ApiError(400, "avatar is required");
+  }
+
+  //avartar me url ajae ga
+  const avatar = await uploadOnCloudinary(avatarLoacalPath);
+
+  if (!avatar.url) {
+    throw ApiError(500, "error while uploading file ");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {$set: {avatar: avatar.url}},
+    {new: true}
+  ).select("-password -refreshToken ");
+});
+
+const updateCoverImage = asyncHandler(async (req, res) => {
+  const coverImageLocalPath = req.file?.path;
+  if (!coverImageLocalPath) {
+    throw ApiError(400, "cover image is required");
+  }
+
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+
+  if (!coverImage.url) {
+    throw ApiError(500, "error in uploading file");
+  }
+
+  const updatedUserDetails = User.findByIdAndUpdate(
+    req.user._id,
+    {$set: {coverImage: coverImage.url}},
+    {new: true}
+  ).select("-password -refreshToken");
+
+  req
+    .status(200)
+    .json(
+      ApiResponse(200, {updatedUserDetails}, "cover Image uploaded Successfull")
+    );
+});
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  changeCurrentPassword,
+  getCurrectUser,
+  updateAccountDetails,
+  updateUserAvatar,
+  updateCoverImage,
+};

@@ -44,6 +44,6 @@ router
   .post(verifyJWT, upload.single("avatar"), updateUserAvatar);
 router
   .route("/updateCoverImage")
-  .post(verifyJWT, upload.single("coverImage"), updateCoverImage);
+  .post(verifyJWT, upload.single("coverImage  "), updateCoverImage);
 
 export default router;

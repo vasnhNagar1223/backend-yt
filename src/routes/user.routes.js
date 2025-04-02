@@ -43,10 +43,10 @@ router.route("/getCurrentUser").post(verifyJWT, getCurrentUser);
 router.route("/updateAccountDetails").post(verifyJWT, updateAccountDetails);
 router
   .route("/updateUserAvatar")
-  .post(verifyJWT, upload.single("avatar"), updateUserAvatar);
+  .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
 router
   .route("/updateCoverImage")
-  .post(verifyJWT, upload.single("coverImage"), updateCoverImage);
+  .patch(verifyJWT, upload.single("coverImage"), updateCoverImage);
 
 router
   .route("/getUserChannelProfile/:username")
